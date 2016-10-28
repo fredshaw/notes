@@ -1,0 +1,55 @@
+user  maaaya maaaya;
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    passenger_root /var/ruby-enterprise/lib/ruby/gems/1.8/gems/passenger-2.2.8;
+    passenger_ruby /var/ruby-enterprise/bin/ruby;
+    passenger_default_user maaaya;
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen   80;
+        server_name  localhost;
+        root /home/maaaya/web/maaaya/public;   
+        passenger_enabled on;
+        rails_env production; 
+        client_max_body_size 10M;
+
+        location ~ ^/(images|javascripts|stylesheets|user_files)/  {
+            access_log off;
+            expires 30d;
+            break;
+        }
+        location ~ ^/javascript:false.+  {
+            access_log off;
+            break;
+        }
+        location ~* ^.+.(jpg|jpeg|gif|css|png|ico|html)$ {
+            access_log        off;
+            expires           30d;
+            break;
+        }
+
+    }
+    
+
+}
